@@ -1,0 +1,4 @@
+# dsh-openrouter-free 安装清单
+# dsh plugin add / bundle 加载时把插件行插入 host composition
+- insert:
+    - name: dsh-openrouter-free

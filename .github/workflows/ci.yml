@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Syntax check (lib/index.js + lib/client.js)
+        run: |
+          node --check lib/index.js
+          node --check lib/client.js
+      - name: Validate package.json & cordis.patch.yml
+        run: |
+          node -e "JSON.parse(require('fs').readFileSync('package.json','utf8')); console.log('package.json OK')"
+          node -e "
+            const yaml = (() => { try { return require('js-yaml') } catch { return null } })();
+            const t = require('fs').readFileSync('cordis.patch.yml','utf8');
+            if (!t.includes('- insert:')) throw new Error('patch missing insert entry');
+            if (!t.includes('dsh-openrouter-free')) throw new Error('patch missing plugin row');
+            console.log('cordis.patch.yml OK');
+          "
+      - name: Bundle manifest present
+        run: node -e "const p=JSON.parse(require('fs').readFileSync('package.json','utf8')); if(!p.dsh.bundle.patch) process.exit(1); console.log('dsh.bundle manifest OK')"
