@@ -4,17 +4,18 @@
 ![DeepSeek Harness](https://img.shields.io/badge/DeepSeek%20Harness-plugin-8b5cf6)
 [![npm](https://img.shields.io/npm/v/dsh-openrouter-free)](https://www.npmjs.com/package/dsh-openrouter-free)
 
-OpenRouter 免费模型面板（DeepSeek Harness / DSH 持久插件）。特性：**综合能力 1-5★ 分级标星 · 最优三优先排序 · 一键切换（推理档自动 max）**。
+OpenRouter 免费模型面板（DeepSeek Harness / DSH 持久插件）。特性：**综合能力 1-5★ 分级标星 · 最优三优先排序 · 一键切换（会话级 + 全局双写，推理档自动预校验）**。
 
 自动拉取 [openrouter.ai](https://openrouter.ai/api/v1/models) 的实时免费模型清单（输入/输出单价均为 $0），一键安装进本机 `openrouter` 路由并设为当前对话模型——免去手动编辑 `settings.yaml` 配置模型的麻烦。
 
 ## 功能
 
 - **免费清单面板**：GUI 会话视图新增「免费模型」标签页，实时列出 OpenRouter 全部免费模型（名称 / ID / 上下文窗口 / 是否支持图片与推理），10 分钟内存缓存，可手动强刷。
-- **一键切换**：点击任意行 → 该模型被 upsert 进 `llm-pi-ai.providers.openrouter.models`，同时 `agent-default-model` 指向它。**下一次请求即生效，无需重启**。
+- **一键切换（会话级 + 全局双写）**：点击任意行 → 该模型被 upsert 进 `llm-pi-ai.providers.openrouter.models`，同时经原生 `sessionController.selectModel()` 写入**当前会话**的模型选择并更新 `agent-default-model`。**下一次请求即生效，无需重启**（对有请求历史的会话，只改全局默认不够——三层优先级 pending→lastUsed→default 会压住它）。
+- **推理档自动预校验**：切换时从高到低试选该模型真正支持的档位（low/medium/high）；不支持推理的模型自动摘掉 `reasoningEffort`，避免请求以 `UNSUPPORTED_REASONING_EFFORT` 失败。
+- **凭据面板**：内置 OpenRouter API Key 设置入口，缺密钥时直接提示补填。
 - **全部装进选择器**：一次把所有免费模型写入路由，之后也能用 DSH 自带模型选择器切换。
 - **安全保留手工条目**：同步/切换单个模型时，所有非免费的手工条目（如 `stealth/ox-alpha` 的精调条目）原样保留；「全部装进选择器」也只刷新免费条目。
-- **推理档自适应**：不支持推理的模型切换时会自动摘掉 `reasoningEffort`，避免请求以 `UNSUPPORTED_REASONING_EFFORT` 失败。
 
 ## 前置条件
 
